@@ -1,0 +1,47 @@
+service: bcgtest
+
+frameworkVersion: '2'
+
+package:
+  individually: true
+  excludeDevDependencies: true
+
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: us-east-2
+  lambdaHashingVersion: 20201221
+
+functions:
+  be-bcg:
+    name: be-bcgtest-dev
+    handler: lambda_function.lambda_handler
+    layers:
+      - arn:aws:lambda:us-east-2:131775762204:layer:Boto3:1
+    environment:
+      AWS_REGION_NEW: us-east-2
+    events:
+      - http:
+          path: /v1/policy
+          method: GET
+          integration: lambda-proxy
+      - http:
+          path: /v1/policy/{policy_id}
+          method: GET
+          integration: lambda-proxy
+      - http:
+          path: /v1/policy/{policy_id}
+          method: POST
+          integration: lambda-proxy
+      - http:
+          path: /v1/policy/{policy_id}
+          method: OPTIONS
+          integration: lambda-proxy
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+plugins:
+  - serverless-python-requirements
